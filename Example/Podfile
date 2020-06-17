@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'CardsViewController_Example' do
+  pod 'CardsViewController', :path => '../'
+
+  target 'CardsViewController_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
