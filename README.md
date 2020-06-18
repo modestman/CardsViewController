@@ -22,7 +22,7 @@ pod 'CardsViewController'
 
 ## Author
 
-modestman, a.glezman@redmadrobot.com
+Anton Glezman, anton@glezman.ru
 
 ## License
 

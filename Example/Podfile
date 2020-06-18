@@ -1,3 +1,4 @@
+platform :ios, '11.0'
 use_frameworks!
 
 target 'CardsViewController_Example' do
@@ -6,6 +7,5 @@ target 'CardsViewController_Example' do
   target 'CardsViewController_Tests' do
     inherit! :search_paths
 
-    
   end
 end
