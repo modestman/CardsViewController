@@ -1,9 +1,11 @@
 # CardsViewController
 
-[![CI Status](https://img.shields.io/travis/modestman/CardsViewController.svg?style=flat)](https://travis-ci.org/modestman/CardsViewController)
+[![Swift](https://img.shields.io/badge/swift-5.0-brightgreen.svg?style=flat)](https://swift.org)
 [![Version](https://img.shields.io/cocoapods/v/CardsViewController.svg?style=flat)](https://cocoapods.org/pods/CardsViewController)
 [![License](https://img.shields.io/cocoapods/l/CardsViewController.svg?style=flat)](https://cocoapods.org/pods/CardsViewController)
 [![Platform](https://img.shields.io/cocoapods/p/CardsViewController.svg?style=flat)](https://cocoapods.org/pods/CardsViewController)
+
+![Platform](Example/example.gif)
 
 ## Example
 
