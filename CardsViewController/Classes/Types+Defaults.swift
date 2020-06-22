@@ -19,9 +19,8 @@ extension CardsViewControllerDatasource {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        transformForCardAt position: Int) -> CGAffineTransform {
-        return .identity
-    }
+        applyTransformFor card: UIView,
+        at position: Int) {}
 }
 
 

@@ -89,7 +89,7 @@ public final class CardsViewController: UIViewController {
             childView.rightAnchor.constraint(equalTo: safeArea.rightAnchor, constant: -cardEdgeInsets.right)
         ])
         view.sendSubviewToBack(childView)
-        childView.transform = cardTransform(card.visibleIndex)
+        cardTransform(childView, card.visibleIndex)
         
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panGesture))
         childView.addGestureRecognizer(pan)
@@ -292,10 +292,10 @@ private extension CardsViewController {
         return delegate?.cardsViewController(self, swipeAnimationAtIndex: index, direction: direction) ?? .throwOut
     }
     
-    var cardTransform: (Int) -> CGAffineTransform {
-        return { [weak self] (position) -> CGAffineTransform in
-            guard let self = self, let dataSource = self.dataSource else { return .identity }
-            return dataSource.cardsViewController(self, transformForCardAt: position)
+    var cardTransform: (UIView, Int) -> Void {
+        return { [weak self] (view, position) -> Void in
+            guard let self = self, let dataSource = self.dataSource else { return }
+            dataSource.cardsViewController(self, applyTransformFor: view, at: position)
         }
     }
 }

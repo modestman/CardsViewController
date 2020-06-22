@@ -13,7 +13,7 @@ struct AppendCardAnimation {
     
     let allCards: [CardsViewController.Card]
     let newCard: CardsViewController.Card?
-    let transform: (Int) -> CGAffineTransform
+    let transform: (UIView, Int) -> Void
     
     var animator: UIViewPropertyAnimator {
         newCard?.containerView.alpha = 0
@@ -21,7 +21,7 @@ struct AppendCardAnimation {
             duration: AnimationHelpers.fastAnimationDuration,
             curve: .easeIn) {
                 for card in self.allCards.dropFirst() {
-                    card.containerView.transform = self.transform(card.visibleIndex) //AnimationHelpers.transform(for: card.visibleIndex)
+                    self.transform(card.containerView, card.visibleIndex)
                     card.containerView.gestureRecognizers?.forEach {
                         // disable PanGestureRecognizer for all cards except the topmost one
                         if $0 is UIPanGestureRecognizer {
@@ -29,7 +29,6 @@ struct AppendCardAnimation {
                         }
                     }
                 }
-                self.newCard?.containerView.alpha = 1.0
             }
         return animator
     }

@@ -67,10 +67,12 @@ public protocol CardsViewControllerDatasource: AnyObject {
     /// Optional method. By default used `.identity` as a transform.
     ///
     /// - Parameters:
+    ///   - card: The view 
     ///   - position: Position is a z-order of card on screen. Topmost card has position = 0.
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        transformForCardAt position: Int) -> CGAffineTransform
+        applyTransformFor card: UIView,
+        at position: Int)
 }
 
 

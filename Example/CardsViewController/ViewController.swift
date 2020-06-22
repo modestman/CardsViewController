@@ -39,6 +39,7 @@ class ViewController: UIViewController {
             cardsController.view.leftAnchor.constraint(equalTo: view.leftAnchor)
         ])
         
+        cardsController.cardEdgeInsets = UIEdgeInsets(top: 120, left: 30, bottom: 90, right: 30)
         cardsController.dataSource = self
         cardsController.delegate = self
         cardsController.reloadCards()
@@ -64,8 +65,6 @@ extension ViewController: CardsViewControllerDatasource {
             reloadVC.action = { self.cardsController.reloadCards() }
             vc = reloadVC
         }
-        vc.view.layer.borderColor = UIColor.black.withAlphaComponent(0.1).cgColor
-        vc.view.layer.borderWidth = 1
         return vc
     }
     
@@ -74,11 +73,11 @@ extension ViewController: CardsViewControllerDatasource {
         decorationViewForCardAt index: Int) -> UIView? {
         
         let shadowView = UIView()
-        shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.4).cgColor
-        shadowView.layer.shadowRadius = 6.0
+        shadowView.layer.shadowColor = UIColor.black.withAlphaComponent(0.1).cgColor
+        shadowView.layer.shadowRadius = 4.0
         shadowView.layer.shadowOpacity = 1.0
-        shadowView.layer.shadowOffset = CGSize(width: 0, height: 0)
-        shadowView.layer.cornerRadius = 8
+        shadowView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        shadowView.layer.cornerRadius = 20
         shadowView.backgroundColor = UIColor.white
         shadowView.clipsToBounds = false
         return shadowView
@@ -90,6 +89,17 @@ extension ViewController: CardsViewControllerDatasource {
         let transform = CGAffineTransform.init(translationX: 0, y: -CGFloat(position) * 30.0)
         let scale = CGFloat(position) * -0.07 + 1.0
         return transform.scaledBy(x: scale, y: scale)
+    }
+    
+    func cardsViewController(
+        _ cardsViewController: CardsViewController,
+        applyTransformFor card: UIView,
+        at position: Int) {
+        
+        let transform = CGAffineTransform.init(translationX: 0, y: -CGFloat(position) * 30.0)
+        let scale = CGFloat(position) * -0.07 + 1.0
+        card.transform = transform.scaledBy(x: scale, y: scale)
+        card.alpha = 1
     }
 }
 
