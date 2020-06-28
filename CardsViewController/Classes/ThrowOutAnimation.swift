@@ -19,7 +19,7 @@ struct ThrowOutAnimation {
     let initialVelocity: CGPoint
     let containerFrame: CGRect
     let duration: DurationType
-    let card: CardsViewController.Card
+    let card: Card
     
     private var view: UIView { card.containerView }
 

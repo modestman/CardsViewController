@@ -11,16 +11,6 @@ import UIKit
 ///
 public final class CardsViewController: UIViewController {
     
-    // MARK: - Types
-    
-    internal struct Card {
-        var absoluteIndex: Int
-        var visibleIndex: Int
-        let containerView: UIView
-        let viewController: UIViewController
-    }
-    
-    
     // MARK: - Public properties
     
     public weak var dataSource: CardsViewControllerDatasource?
@@ -78,7 +68,8 @@ public final class CardsViewController: UIViewController {
             absoluteIndex: index,
             visibleIndex: (cards.last?.visibleIndex ?? -1) + 1,
             containerView: childView,
-            viewController: childVC)
+            viewController: childVC,
+            state: .inStack)
         
         let safeArea = view.safeAreaLayoutGuide
         addChild(childVC)
@@ -93,7 +84,7 @@ public final class CardsViewController: UIViewController {
         
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panGesture))
         childView.addGestureRecognizer(pan)
-        pan.isEnabled = card.visibleIndex == 0
+        pan.isEnabled = true
             
         cards.append(card)
         return card
@@ -102,7 +93,7 @@ public final class CardsViewController: UIViewController {
     private func addNextCard() -> Card? {
         guard
             let dataSource = dataSource,
-            let lastCard = cards.last
+            let lastCard = cards.max(by: { $0.absoluteIndex < $1.absoluteIndex })
         else { return nil }
         if lastCard.absoluteIndex < dataSource.numberOfItemsInCardsViewController(self) - 1 {
             return addCard(index: lastCard.absoluteIndex + 1)
@@ -137,7 +128,10 @@ public final class CardsViewController: UIViewController {
 extension CardsViewController: UIGestureRecognizerDelegate {
     
     @objc func panGesture(_ gestureRecognizer : UIPanGestureRecognizer) {
-        guard let piece = gestureRecognizer.view else {return}
+        guard
+            let piece = gestureRecognizer.view,
+            let card = cards.first(where: { $0.absoluteIndex == piece.tag })
+        else { return }
         
         let translation = gestureRecognizer.translation(in: piece.superview)
         let velocity = gestureRecognizer.velocity(in: piece)
@@ -152,106 +146,176 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             let angle = CGFloat.pi / 8 * dx / view.bounds.width
             let rotation = CGAffineTransform(rotationAngle: angle)
             piece.transform = rotation.translatedBy(x: translation.x, y: translation.y)
+            card.state = .dragging
             
             let progress = self.progress(translation: translation, direction: direction)
             delegate?.cardsViewController(self, didMoveCardAtIndex: piece.tag, direction: direction, progress: progress)
             
         case .ended:
             if canFinishSwipe(cardIndex: piece.tag, translation: translation, velocity: velocity) {
-                finishSwipe(view: piece, velocity: velocity, direction: direction)
+                finishSwipe(card: card, velocity: velocity, direction: direction)
             } else {
-                cancelSwipe(view: piece, velocity: velocity)
+                cancelSwipe(card: card, velocity: velocity)
             }
             
         case .cancelled, .failed:
-            cancelSwipe(view: piece, velocity: velocity)
+            cancelSwipe(card: card, velocity: velocity)
 
         @unknown default:
             break
         }
     }
     
-    private func finishSwipe(view: UIView, velocity: CGPoint, direction: SwipeDirection) {
-        let animation = swipeAnimation(at: view.tag, direction: direction)
+    private func finishSwipe(card: Card, velocity: CGPoint, direction: SwipeDirection) {
+        let animation = swipeAnimation(at: card.absoluteIndex, direction: direction)
         switch animation {
         case .throwOut:
-            throwOutAnimation(view: view, velocity: velocity, direction: direction)
+            throwOutAnimation(card: card, velocity: velocity, direction: direction)
         case .putAtTheEnd:
-            putAtTheEndAnimation(view: view, velocity: velocity, direction: direction)
+            putAtTheEndAnimation(card: card, velocity: velocity, direction: direction)
         case .none:
-            break
+            card.state = .inStack
         }
     }
     
-    private func throwOutAnimation(view: UIView, velocity: CGPoint, direction: SwipeDirection) {
-        guard let card = cards.first(where: { $0.absoluteIndex == view.tag }) else { return }
+    private func throwOutAnimation(card: Card, velocity: CGPoint, direction: SwipeDirection) {
+        card.animator?.stopAnimation(true)
         
         // First animation - throw out the card
+        card.state = .removingAnimtion
         let firstAnimator = ThrowOutAnimation(
             initialVelocity: velocity,
             containerFrame: self.view.frame,
             duration: .default,
             card: card).animator
         firstAnimator.addCompletion { [weak self] _ in
-            self?.deleteCard(index: view.tag)
+            guard let self = self else { return }
+            self.deleteCard(index: card.absoluteIndex)
+            self.delegate?.cardsViewController(
+                self,
+                finishMoveCardAtIndex: card.absoluteIndex,
+                direction: direction,
+                animation: .throwOut)
         }
         firstAnimator.startAnimation()
         
         // Second animation - add new card at the back
         let newCard = addNextCard()
-        for i in 1..<cards.count {
-            cards[i].visibleIndex = i - 1
+        newCard?.containerView.alpha = 0.0
+        let restCards = cards.filter { $0.state != .removingAnimtion }
+        for i in 0..<restCards.count {
+            let card = restCards[i]
+            card.visibleIndex = i
+            card.state = .transformAnimation
+            let animator = transformAnimator(for: card)
+            card.animator = animator
+            animator.addCompletion { _ in
+                card.state = .inStack
+                card.animator = nil
+            }
+            animator.startAnimation()
         }
-        let secondAnimator = AppendCardAnimation(allCards: cards, newCard: newCard, transform: cardTransform).animator
-        secondAnimator.addCompletion { [weak self] _ in
-            guard let self = self else { return }
-            self.delegate?.cardsViewController(
-                self,
-                finishMoveCardAtIndex: view.tag,
-                direction: direction,
-                animation: .throwOut)
-        }
-        secondAnimator.startAnimation()
     }
     
-    private func putAtTheEndAnimation(view: UIView, velocity: CGPoint, direction: SwipeDirection) {
-        guard let card = cards.first(where: { $0.absoluteIndex == view.tag }) else { return }
+    private func transformAnimator(for card: Card) -> UIViewPropertyAnimator {
+        return UIViewPropertyAnimator(
+            duration: AnimationHelpers.fastAnimationDuration,
+            curve: .easeIn) { [weak self] in
+                self?.cardTransform(card.containerView, card.visibleIndex)
+            }
+    }
+    
+    private func putAtTheEndAnimation(card: Card, velocity: CGPoint, direction: SwipeDirection) {
+        let view = card.containerView
         
         // First animation - throw out the card
+        card.state = .removingAnimtion
         let firstAnimator = ThrowOutAnimation(
             initialVelocity: velocity,
             containerFrame: view.frame,
             duration: .dependentOfLength,
             card: card).animator
-        
-        // Second animation - put the card at the end of stack and add a new card at the back
-        let newCard = addNextCard()
-        cards.append(cards.removeFirst()) // reorder
-        for i in 0..<cards.count {
-            cards[i].visibleIndex = i
-        }
-        let secondAnimator = PutAtTheEndAnimation(allCards: cards, newCard: newCard, transform: cardTransform).animator
-        secondAnimator.addCompletion { [weak self] _ in
-            guard let self = self else { return }
-            self.deleteCard(index: view.tag)
-            self.delegate?.cardsViewController(
-                self,
-                finishMoveCardAtIndex: view.tag,
-                direction: direction,
-                animation: .putAtTheEnd)
-        }
+        card.animator = firstAnimator
         
         firstAnimator.addCompletion { [weak self] _ in
-            self?.view.sendSubviewToBack(view)
-            secondAnimator.startAnimation()
+            guard let self = self else { return }
+            card.animator = nil
+            card.state = .inStack
+            
+            // Second animation - put the card at the end of stack and add a new card at the back
+            self.finishPutAtTheEndAnimation(deletedCard: card) {
+                self.delegate?.cardsViewController(
+                    self,
+                    finishMoveCardAtIndex: card.absoluteIndex,
+                    direction: direction,
+                    animation: .putAtTheEnd)
+            }
         }
         
         firstAnimator.startAnimation()
     }
     
-    private func cancelSwipe(view: UIView, velocity: CGPoint) {
-        let animator = CancelAnimation(view: view, velocity: velocity).animator
+    private func finishPutAtTheEndAnimation(deletedCard: Card, completion: @escaping () -> Void) {
+        
+        let newCard = addNextCard()
+        newCard?.containerView.alpha = 0.0
+        
+        let normalCards = cards
+            .filter {
+                $0.state != .removingAnimtion && $0.absoluteIndex != deletedCard.absoluteIndex
+            }
+            .sorted { $0.absoluteIndex < $1.absoluteIndex }
+        
+        let deletedCards = cards
+            .filter {
+                $0.state == .removingAnimtion || $0.absoluteIndex == deletedCard.absoluteIndex
+            }
+            .sorted { $0.absoluteIndex < $1.absoluteIndex }
+        
+        cards = normalCards + deletedCards
+        deletedCards.forEach { view.sendSubviewToBack($0.containerView) }
+        
+        for i in 0..<cards.count {
+            let card = cards[i]
+            card.visibleIndex = i
+            
+            if card.state == .removingAnimtion { continue }
+            
+            if card.absoluteIndex != deletedCard.absoluteIndex {
+                let animator = transformAnimator(for: card)
+                card.state = .transformAnimation
+                card.animator = animator
+                animator.addCompletion { _ in
+                    card.state = .inStack
+                    card.animator = nil
+                }
+                animator.startAnimation()
+            } else {
+                let animator = transformAnimator(for: card)
+                card.animator = animator
+                card.state = .removingAnimtion
+                animator.addAnimations {
+                    card.containerView.alpha = 0.2
+                }
+                animator.addCompletion { [weak self] _ in
+                    guard let self = self else { return }
+                    card.animator = nil
+                    card.state = .inStack
+                    self.deleteCard(index: deletedCard.absoluteIndex)
+                    completion()
+                }
+                animator.startAnimation()
+            }
+        }
+    }
+    
+    private func cancelSwipe(card: Card, velocity: CGPoint) {
+        card.state = .cancelAnimation
+        let animator = CancelAnimation(view: card.containerView, velocity: velocity).animator
         animator.startAnimation()
+        animator.addCompletion { _ in
+            card.state = .inStack
+        }
         delegate?.cardsViewController(self, cancelMoveCardAtIndex: view.tag)
     }
 

@@ -104,3 +104,40 @@ public protocol CardsViewControllerDelegate: AnyObject {
         _ cardsViewController: CardsViewController,
         cancelMoveCardAtIndex: Int)
 }
+
+
+// MARK: - Internal types
+
+internal enum CardSate {
+    case inStack
+    case dragging
+    case cancelAnimation
+    case removingAnimtion
+    case transformAnimation
+}
+
+internal class Card {
+    let absoluteIndex: Int
+    var visibleIndex: Int
+    let containerView: UIView
+    let viewController: UIViewController
+    var state: CardSate
+    var animator: UIViewPropertyAnimator?
+    
+    init(
+        absoluteIndex: Int,
+        visibleIndex: Int,
+        containerView: UIView,
+        viewController: UIViewController,
+        state: CardSate) {
+        self.absoluteIndex = absoluteIndex
+        self.visibleIndex = visibleIndex
+        self.containerView = containerView
+        self.viewController = viewController
+        self.state = state
+    }
+    
+    var panGestureRecognizer: UIPanGestureRecognizer? {
+        return containerView.gestureRecognizers?.first(where: { $0 is UIPanGestureRecognizer }) as? UIPanGestureRecognizer
+    }
+}
