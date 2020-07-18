@@ -61,7 +61,7 @@ public final class CardsViewController: UIViewController {
     private func addCard(index: Int) -> Card? {
         guard let dataSource = dataSource else { return nil }
         let childVC = dataSource.cardsViewController(self, viewControllerAt: index)
-        let childView = decorateView(nestedView: childVC.view, index: index)
+        let childView = decorateView(nestedView: childVC.frontView, index: index)
         childView.tag = index
         
         let card = Card(
@@ -85,6 +85,10 @@ public final class CardsViewController: UIViewController {
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panGesture))
         childView.addGestureRecognizer(pan)
         pan.isEnabled = true
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapGesture))
+        childView.addGestureRecognizer(tap)
+        tap.isEnabled = true
             
         cards.append(card)
         return card
@@ -126,6 +130,31 @@ public final class CardsViewController: UIViewController {
 }
 
 extension CardsViewController: UIGestureRecognizerDelegate {
+    
+    @objc func tapGesture(_ gestureRecognizer : UITapGestureRecognizer) {
+        guard
+            let piece = gestureRecognizer.view,
+            let card = cards.first(where: { $0.absoluteIndex == piece.tag }),
+            let backView = card.viewController.backView,
+            tapAnimation(at: card.absoluteIndex) == .flip
+        else { return }
+        
+        let prevView = card.isFlipped ? backView : card.viewController.frontView
+        let nextView = card.isFlipped ? card.viewController.frontView : backView
+        view.isUserInteractionEnabled = false
+        UIView.transition(
+            with: card.containerView,
+            duration: AnimationHelpers.defaultAnimationDuration,
+            options: .transitionFlipFromLeft,
+            animations: {
+                prevView.removeFromSuperview()
+                card.containerView.addSubview(nextView, with: card.containerView)
+                nextView.layer.cornerRadius = card.containerView.layer.cornerRadius
+                card.isFlipped.toggle()
+            }, completion: { _ in
+                self.view.isUserInteractionEnabled = true
+            })
+    }
     
     @objc func panGesture(_ gestureRecognizer : UIPanGestureRecognizer) {
         guard
@@ -354,6 +383,10 @@ private extension CardsViewController {
     
     func swipeAnimation(at index: Int, direction: SwipeDirection) -> SwipeAnimation {
         return delegate?.cardsViewController(self, swipeAnimationAt: index, direction: direction) ?? .throwOut
+    }
+    
+    func tapAnimation(at index: Int) -> TapAnimation {
+        return delegate?.cardsViewController(self, tapAnimationAt: index) ?? .none
     }
     
     var cardTransform: (UIView, Int) -> Void {

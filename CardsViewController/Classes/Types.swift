@@ -8,6 +8,16 @@
 
 import UIKit
 
+/// Each card should conform this protocol
+public protocol CardViewController: UIViewController {
+    
+    /// The default visible card view
+    var frontView: UIView { get }
+    
+    /// The backside of the card. Displayed when the card is flipped
+    var backView: UIView? { get }
+}
+
 public enum SwipeDirection: String {
     case up
     case down
@@ -50,7 +60,7 @@ public protocol CardsViewControllerDatasource: AnyObject {
     ///   - index: index of a card
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        viewControllerAt index: Int) -> UIViewController
+        viewControllerAt index: Int) -> CardViewController
     
     /// Get a view that will be a container for a card. You can decorate this view with a shadow or a border.
     ///
@@ -120,21 +130,24 @@ internal class Card {
     let absoluteIndex: Int
     var visibleIndex: Int
     let containerView: UIView
-    let viewController: UIViewController
+    let viewController: CardViewController
     var state: CardSate
+    var isFlipped: Bool
     var animator: UIViewPropertyAnimator?
     
     init(
         absoluteIndex: Int,
         visibleIndex: Int,
         containerView: UIView,
-        viewController: UIViewController,
-        state: CardSate) {
+        viewController: CardViewController,
+        state: CardSate,
+        isFlipped: Bool = false) {
         self.absoluteIndex = absoluteIndex
         self.visibleIndex = visibleIndex
         self.containerView = containerView
         self.viewController = viewController
         self.state = state
+        self.isFlipped = isFlipped
     }
     
     var panGestureRecognizer: UIPanGestureRecognizer? {

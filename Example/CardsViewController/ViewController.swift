@@ -54,11 +54,11 @@ extension ViewController: CardsViewControllerDatasource {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        viewControllerAt index: Int) -> UIViewController {
+        viewControllerAt index: Int) -> CardViewController {
         
-        let vc: UIViewController
+        let vc: CardViewController
         if index < colors.count {
-            vc = UIViewController()
+            vc = MyCardViewController()
             vc.view.backgroundColor = colors[index]
         } else {
             let reloadVC = ReloadViewController()
@@ -127,7 +127,7 @@ extension ViewController: CardsViewControllerDelegate {
         _ cardsViewController: CardsViewController,
         tapAnimationAt index: Int) -> TapAnimation {
         
-        return .none
+        return .flip
     }
     
     func cardsViewController(

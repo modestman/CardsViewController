@@ -7,8 +7,12 @@
 //
 
 import UIKit
+import protocol CardsViewController.CardViewController
 
-final class ReloadViewController: UIViewController {
+final class ReloadViewController: UIViewController, CardViewController {
+    
+    var frontView: UIView { view }
+    var backView: UIView? = nil
     
     var action: (() -> Void)?
     

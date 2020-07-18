@@ -12,6 +12,7 @@
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		7832D93024C361670084228E /* MyCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7832D92F24C361670084228E /* MyCardViewController.swift */; };
 		78481175249ABB1D001BB0D3 /* ReloadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78481174249ABB1D001BB0D3 /* ReloadViewController.swift */; };
 		78481177249BC191001BB0D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 78481176249BC191001BB0D3 /* LaunchScreen.storyboard */; };
 		7AEA2DB441505C6D8F488394 /* Pods_CardsViewController_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E86C9F42C39EAD3C4B420B4 /* Pods_CardsViewController_Example.framework */; };
@@ -42,6 +43,7 @@
 		607FACE51AFB9204008FA782 /* CardsViewController_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CardsViewController_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
+		7832D92F24C361670084228E /* MyCardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyCardViewController.swift; sourceTree = "<group>"; };
 		78481174249ABB1D001BB0D3 /* ReloadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReloadViewController.swift; sourceTree = "<group>"; };
 		78481176249BC191001BB0D3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7D9F367E94A24E98847F3441 /* Pods-CardsViewController_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CardsViewController_Example.release.xcconfig"; path = "Target Support Files/Pods-CardsViewController_Example/Pods-CardsViewController_Example.release.xcconfig"; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
+				7832D92F24C361670084228E /* MyCardViewController.swift */,
 				78481174249ABB1D001BB0D3 /* ReloadViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
@@ -335,6 +338,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7832D93024C361670084228E /* MyCardViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				78481175249ABB1D001BB0D3 /* ReloadViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
