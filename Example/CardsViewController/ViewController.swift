@@ -54,7 +54,7 @@ extension ViewController: CardsViewControllerDatasource {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        viewControllerAtIndex index: Int) -> UIViewController {
+        viewControllerAt index: Int) -> UIViewController {
         
         let vc: UIViewController
         if index < colors.count {
@@ -125,14 +125,14 @@ extension ViewController: CardsViewControllerDelegate {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        tapAnimationAtIndex index: Int) -> TapAnimation {
+        tapAnimationAt index: Int) -> TapAnimation {
         
         return .none
     }
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        didMoveCardAtIndex: Int,
+        didMoveCardAt index: Int,
         direction: SwipeDirection,
         progress: Float) {
         
@@ -141,7 +141,7 @@ extension ViewController: CardsViewControllerDelegate {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        finishMoveCardAtIndex: Int,
+        finishMoveCardAt index: Int,
         direction: SwipeDirection,
         animation: SwipeAnimation) {
         print("finish")
@@ -149,7 +149,7 @@ extension ViewController: CardsViewControllerDelegate {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        cancelMoveCardAtIndex: Int) {
+        cancelMoveCardAt index: Int) {
         print("cancel")
     }
 }

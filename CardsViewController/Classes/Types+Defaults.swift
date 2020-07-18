@@ -9,7 +9,7 @@
 import UIKit
 
 /// Default datasource implementation
-extension CardsViewControllerDatasource {
+public extension CardsViewControllerDatasource {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
@@ -25,11 +25,11 @@ extension CardsViewControllerDatasource {
 
 
 /// Default delegate implementation
-extension CardsViewControllerDelegate {
+public extension CardsViewControllerDelegate {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        swipeAnimationAtIndex index: Int,
+        swipeAnimationAt index: Int,
         direction: SwipeDirection) -> SwipeAnimation {
         
         return .throwOut
@@ -44,17 +44,17 @@ extension CardsViewControllerDelegate {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        finishMoveCardAtIndex: Int,
+        finishMoveCardAt index: Int,
         direction: SwipeDirection,
         animation: SwipeAnimation) {}
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        didMoveCardAtIndex: Int,
+        didMoveCardAt index: Int,
         direction: SwipeDirection,
         progress: Float) {}
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        cancelMoveCardAtIndex: Int) {}
+        cancelMoveCardAt index: Int) {}
 }

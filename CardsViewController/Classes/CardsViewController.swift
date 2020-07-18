@@ -60,7 +60,7 @@ public final class CardsViewController: UIViewController {
     @discardableResult
     private func addCard(index: Int) -> Card? {
         guard let dataSource = dataSource else { return nil }
-        let childVC = dataSource.cardsViewController(self, viewControllerAtIndex: index)
+        let childVC = dataSource.cardsViewController(self, viewControllerAt: index)
         let childView = decorateView(nestedView: childVC.view, index: index)
         childView.tag = index
         
@@ -149,7 +149,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             card.state = .dragging
             
             let progress = self.progress(translation: translation, direction: direction)
-            delegate?.cardsViewController(self, didMoveCardAtIndex: piece.tag, direction: direction, progress: progress)
+            delegate?.cardsViewController(self, didMoveCardAt: piece.tag, direction: direction, progress: progress)
             
         case .ended:
             if canFinishSwipe(cardIndex: piece.tag, translation: translation, velocity: velocity) {
@@ -193,7 +193,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             self.deleteCard(index: card.absoluteIndex)
             self.delegate?.cardsViewController(
                 self,
-                finishMoveCardAtIndex: card.absoluteIndex,
+                finishMoveCardAt: card.absoluteIndex,
                 direction: direction,
                 animation: .throwOut)
         }
@@ -246,7 +246,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             self.finishPutAtTheEndAnimation(deletedCard: card) {
                 self.delegate?.cardsViewController(
                     self,
-                    finishMoveCardAtIndex: card.absoluteIndex,
+                    finishMoveCardAt: card.absoluteIndex,
                     direction: direction,
                     animation: .putAtTheEnd)
             }
@@ -316,7 +316,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         animator.addCompletion { _ in
             card.state = .inStack
         }
-        delegate?.cardsViewController(self, cancelMoveCardAtIndex: view.tag)
+        delegate?.cardsViewController(self, cancelMoveCardAt: view.tag)
     }
 
     private func canFinishSwipe(cardIndex: Int, translation: CGPoint, velocity: CGPoint) -> Bool {
@@ -353,7 +353,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
 private extension CardsViewController {
     
     func swipeAnimation(at index: Int, direction: SwipeDirection) -> SwipeAnimation {
-        return delegate?.cardsViewController(self, swipeAnimationAtIndex: index, direction: direction) ?? .throwOut
+        return delegate?.cardsViewController(self, swipeAnimationAt: index, direction: direction) ?? .throwOut
     }
     
     var cardTransform: (UIView, Int) -> Void {

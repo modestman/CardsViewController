@@ -50,7 +50,7 @@ public protocol CardsViewControllerDatasource: AnyObject {
     ///   - index: index of a card
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        viewControllerAtIndex index: Int) -> UIViewController
+        viewControllerAt index: Int) -> UIViewController
     
     /// Get a view that will be a container for a card. You can decorate this view with a shadow or a border.
     ///
@@ -81,28 +81,28 @@ public protocol CardsViewControllerDelegate: AnyObject {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        swipeAnimationAtIndex index: Int,
+        swipeAnimationAt index: Int,
         direction: SwipeDirection) -> SwipeAnimation
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        tapAnimationAtIndex index: Int) -> TapAnimation
+        tapAnimationAt index: Int) -> TapAnimation
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        finishMoveCardAtIndex: Int,
+        finishMoveCardAt index: Int,
         direction: SwipeDirection,
         animation: SwipeAnimation)
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        didMoveCardAtIndex: Int,
+        didMoveCardAt index: Int,
         direction: SwipeDirection,
         progress: Float)
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        cancelMoveCardAtIndex: Int)
+        cancelMoveCardAt index: Int)
 }
 
 
