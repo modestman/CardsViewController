@@ -28,9 +28,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        addChildViewController(cardsController)
+        addChild(cardsController)
         view.addSubview(cardsController.view)
-        cardsController.didMove(toParentViewController: self)
+        cardsController.didMove(toParent: self)
         cardsController.view.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             cardsController.view.topAnchor.constraint(equalTo: view.topAnchor),
@@ -108,7 +108,7 @@ extension ViewController: CardsViewControllerDelegate {
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        swipeAnimationAtIndex index: Int,
+        swipeAnimationAt index: Int,
         direction: SwipeDirection) -> SwipeAnimation {
         
         guard index != colors.count else { return .none }
