@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/cocoapods/l/CardsViewController.svg?style=flat)](https://cocoapods.org/pods/CardsViewController)
 [![Platform](https://img.shields.io/cocoapods/p/CardsViewController.svg?style=flat)](https://cocoapods.org/pods/CardsViewController)
 
-<img src="https://user-images.githubusercontent.com/1762267/85059989-27002180-b1ad-11ea-8a23-6e8bb92dff6b.gif" width="300">
+![example](Example/example.gif)
 
 ## Example
 
