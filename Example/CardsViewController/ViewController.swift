@@ -11,6 +11,7 @@ import CardsViewController
 
 class ViewController: UIViewController {
     
+    @IBOutlet private weak var stackView: UIStackView!
     let cardsController = CardsViewController()
     
     let colors: [UIColor] = [
@@ -43,6 +44,16 @@ class ViewController: UIViewController {
         cardsController.dataSource = self
         cardsController.delegate = self
         cardsController.reloadCards()
+        
+        view.bringSubviewToFront(stackView)
+    }
+    
+    @IBAction private func performLeftAnimation() {
+        cardsController.performCardSwipeAnimation(direction: .left)
+    }
+    
+    @IBAction private func performRightAnimation() {
+        cardsController.performCardSwipeAnimation(direction: .right)
     }
 }
 

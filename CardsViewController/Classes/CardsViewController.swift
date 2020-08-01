@@ -54,6 +54,28 @@ public final class CardsViewController: UIViewController {
         }
     }
     
+    /// Programatically run an animation for the topmost card.
+    /// The type of animation will be requested from the delegate according with the card index and direction.
+    public func performCardSwipeAnimation(direction: SwipeDirection) {
+        guard let card = cards.first else { return }
+        let animation = swipeAnimation(at: card.absoluteIndex, direction: direction)
+        guard animation != .none  else { return }
+        finishSwipe(card: card, velocity: AnimationHelpers.velosity(for: direction), direction: direction)
+    }
+    
+    /// Animated shake the topmost card to the left and right
+    public func shakeCard() {
+        guard let card = cards.first else { return }
+        card.state = .transformAnimation
+        let shake = ShakeAnimation(
+            view: card.containerView,
+            width: view.bounds.width,
+            completion: {
+                card.state = .inStack
+            }
+        )
+        shake.animator.startAnimation()
+    }
     
     // MARK: - Private methods
     

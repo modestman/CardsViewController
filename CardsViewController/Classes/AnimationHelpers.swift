@@ -85,4 +85,18 @@ struct AnimationHelpers {
         let scale = CGFloat(visibleIndex) * -0.07 + 1.0
         return transform.scaledBy(x: scale, y: scale)
     }
+    
+    static func velosity(for direction: SwipeDirection) -> CGPoint {
+        let const = 2000
+        switch direction {
+        case .right:
+            return CGPoint(x: const, y: -const/2)
+        case .left:
+            return CGPoint(x: -const, y: const/2)
+        case .up:
+            return CGPoint(x: const/2, y: -const)
+        case .down:
+            return CGPoint(x: -const/2, y: const)
+        }
+    }
 }
