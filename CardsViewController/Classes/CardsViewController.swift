@@ -22,6 +22,11 @@ public final class CardsViewController: UIViewController {
     /// Edge insets between controller view and topmost card view
     public var cardEdgeInsets = UIEdgeInsets(top: 60, left: 40, bottom: 40, right: 40)
     
+    /// Whether or not swipe and tap gestures are enabled on cards
+    public var isGesturesEnabled: Bool = true {
+        didSet { enableCardGestures(isGesturesEnabled) }
+    }
+    
     
     // MARK: - Private properties
     
@@ -106,11 +111,11 @@ public final class CardsViewController: UIViewController {
         
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panGesture))
         childView.addGestureRecognizer(pan)
-        pan.isEnabled = true
+        pan.isEnabled = isGesturesEnabled
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapGesture))
         childView.addGestureRecognizer(tap)
-        tap.isEnabled = true
+        tap.isEnabled = isGesturesEnabled
             
         cards.append(card)
         return card
@@ -397,6 +402,12 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         return min(progress, 1.0)
     }
 
+    private func enableCardGestures(_ enabled: Bool) {
+        for card in cards {
+            card.panGestureRecognizer?.isEnabled = enabled
+            card.tapGestureRecognizer?.isEnabled = enabled
+        }
+    }
 }
 
 /// Default delegate implementation

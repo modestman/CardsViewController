@@ -153,4 +153,8 @@ internal class Card {
     var panGestureRecognizer: UIPanGestureRecognizer? {
         return containerView.gestureRecognizers?.first(where: { $0 is UIPanGestureRecognizer }) as? UIPanGestureRecognizer
     }
+    
+    var tapGestureRecognizer: UITapGestureRecognizer? {
+        return containerView.gestureRecognizers?.first(where: { $0 is UITapGestureRecognizer }) as? UITapGestureRecognizer
+    }
 }
