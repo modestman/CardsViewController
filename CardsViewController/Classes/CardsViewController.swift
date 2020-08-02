@@ -27,6 +27,10 @@ public final class CardsViewController: UIViewController {
         didSet { enableCardGestures(isGesturesEnabled) }
     }
     
+    public var topmostCardIndex: Int? {
+        cards.first?.absoluteIndex
+    }
+    
     
     // MARK: - Private properties
     
@@ -60,12 +64,25 @@ public final class CardsViewController: UIViewController {
     }
     
     /// Programatically run an animation for the topmost card.
-    /// The type of animation will be requested from the delegate according with the card index and direction.
-    public func performCardSwipeAnimation(direction: SwipeDirection) {
+    public func performCardSwipeAnimation(_ animation: SwipeAnimation, direction: SwipeDirection) {
         guard let card = cards.first else { return }
-        let animation = swipeAnimation(at: card.absoluteIndex, direction: direction)
-        guard animation != .none  else { return }
-        finishSwipe(card: card, velocity: AnimationHelpers.velosity(for: direction), direction: direction)
+        switch animation {
+        case .throwOut:
+            throwOutAnimation(
+                card: card,
+                velocity: AnimationHelpers.velosity(for: direction),
+                direction: direction,
+                fromSwipe: false
+            )
+        case .putAtTheEnd:
+            putAtTheEndAnimation(
+                card: card,
+                velocity: AnimationHelpers.velosity(for: direction),
+                direction: direction
+            )
+        case .none:
+            break
+        }
     }
     
     /// Animated shake the topmost card to the left and right
@@ -234,7 +251,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         }
     }
     
-    private func throwOutAnimation(card: Card, velocity: CGPoint, direction: SwipeDirection) {
+    private func throwOutAnimation(card: Card, velocity: CGPoint, direction: SwipeDirection, fromSwipe: Bool = true) {
         card.animator?.stopAnimation(true)
         
         // First animation - throw out the card
@@ -242,8 +259,10 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         let firstAnimator = ThrowOutAnimation(
             initialVelocity: velocity,
             containerFrame: self.view.frame,
-            duration: .default,
-            card: card).animator
+            duration: fromSwipe ? .default : .long,
+            card: card,
+            curve: fromSwipe ? .easeOut : .easeInOut
+        ).animator
         firstAnimator.addCompletion { [weak self] _ in
             guard let self = self else { return }
             self.deleteCard(index: card.absoluteIndex)

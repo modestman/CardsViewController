@@ -49,11 +49,11 @@ class ViewController: UIViewController {
     }
     
     @IBAction private func performLeftAnimation() {
-        cardsController.performCardSwipeAnimation(direction: .left)
+        cardsController.performCardSwipeAnimation(.putAtTheEnd, direction: .left)
     }
     
     @IBAction private func performRightAnimation() {
-        cardsController.performCardSwipeAnimation(direction: .right)
+        cardsController.performCardSwipeAnimation(.throwOut, direction: .right)
     }
 }
 
