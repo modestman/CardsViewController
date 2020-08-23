@@ -20,8 +20,8 @@ struct AnimationHelpers {
     /// - Parameter velocity: вектор скорости
     /// - Parameter frame: размеры экрана
     /// - Returns: направление `SwipeDirection`
-    static func direction(with velocity: CGPoint, in frame: CGRect = UIScreen.main.bounds) -> SwipeDirection {
-        guard velocity.length != 0 else { fatalError() }
+    static func direction(with velocity: CGPoint, in frame: CGRect = UIScreen.main.bounds) -> SwipeDirection? {
+        guard velocity.length != 0 else { return nil }
         
         let angle = atan2(velocity.y, velocity.x)
         let topLeftAngle = atan2(-frame.height, -frame.width)
@@ -38,7 +38,7 @@ struct AnimationHelpers {
             case bottomLeftAngle...CGFloat.pi:
                 return .left
             default:
-                fatalError()
+                return nil
             }
         } else {
             switch angle {
@@ -49,7 +49,7 @@ struct AnimationHelpers {
             case topRightAngle...0:
                 return .right
             default:
-                fatalError()
+                return nil
             }
         }
     }
@@ -60,8 +60,11 @@ struct AnimationHelpers {
     ///   - velocity: вектор скорости, определяет направление движения
     /// - Returns: вектор перемещения
     static func translationOut(of frame: CGRect, velocity: CGPoint) -> CGPoint {
-        guard velocity.length != 0 else { return .zero }
-        let direction = self.direction(with: velocity)
+        guard
+            velocity.length != 0,
+            let direction = self.direction(with: velocity)
+        else { return .zero }
+        
         let e = CGVector(dx: velocity.x / velocity.length, dy: velocity.y / velocity.length)
         let destination: CGPoint
         switch direction {

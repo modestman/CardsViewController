@@ -208,7 +208,10 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         
         let translation = gestureRecognizer.translation(in: piece.superview)
         let velocity = gestureRecognizer.velocity(in: piece)
-        let direction = AnimationHelpers.direction(with: velocity, in: view.frame)
+        guard let direction = AnimationHelpers.direction(with: velocity, in: view.frame) else {
+            cancelSwipe(card: card, velocity: velocity)
+            return
+        }
         
         switch gestureRecognizer.state {
         case .possible:
@@ -395,7 +398,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
     }
 
     private func canFinishSwipe(cardIndex: Int, translation: CGPoint, velocity: CGPoint) -> Bool {
-        let direction = AnimationHelpers.direction(with: velocity, in: view.frame)
+        guard let direction = AnimationHelpers.direction(with: velocity, in: view.frame) else { return false }
         let animation = swipeAnimation(at: cardIndex, direction: direction)
         guard animation != .none  else { return false }
         
