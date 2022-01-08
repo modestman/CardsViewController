@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CardsViewController'
-  s.version          = '1.1.2'
+  s.version          = '1.2.0'
   s.summary          = 'CardsViewController is an implementation of collection swipeable cards.'
   s.description      = <<-DESC
 TODO: Add long description of the pod here.
