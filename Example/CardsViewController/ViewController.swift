@@ -163,5 +163,12 @@ extension ViewController: CardsViewControllerDelegate {
         cancelMoveCardAt index: Int) {
         print("cancel")
     }
+    
+    func cardsViewController(
+        _ cardsViewController: CardsViewController,
+        didShowCardAt index: Int
+    ) {
+        print("didShowCardAt: \(index)")
+    }
 }
 

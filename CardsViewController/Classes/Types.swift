@@ -16,6 +16,12 @@ public protocol CardViewController: UIViewController {
     
     /// The backside of the card. Displayed when the card is flipped
     var backView: UIView? { get }
+    
+    /// The action performed before flip animation
+    func willFlipCard()
+    
+    /// The action performed after flip animation
+    func didFlipCard()
 }
 
 public enum SwipeDirection: String {
@@ -113,6 +119,10 @@ public protocol CardsViewControllerDelegate: AnyObject {
     func cardsViewController(
         _ cardsViewController: CardsViewController,
         cancelMoveCardAt index: Int)
+    
+    func cardsViewController(
+        _ cardsViewController: CardsViewController,
+        didShowCardAt index: Int)
 }
 
 
@@ -122,7 +132,7 @@ internal enum CardSate {
     case inStack
     case dragging
     case cancelAnimation
-    case removingAnimtion
+    case removingAnimation
     case transformAnimation
 }
 

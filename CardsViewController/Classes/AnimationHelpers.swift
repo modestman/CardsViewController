@@ -89,7 +89,7 @@ struct AnimationHelpers {
         return transform.scaledBy(x: scale, y: scale)
     }
     
-    static func velosity(for direction: SwipeDirection) -> CGPoint {
+    static func velocity(for direction: SwipeDirection) -> CGPoint {
         let const = 2000
         switch direction {
         case .right:

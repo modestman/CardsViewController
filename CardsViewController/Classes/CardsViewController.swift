@@ -61,23 +61,24 @@ public final class CardsViewController: UIViewController {
         for i in 0..<count {
             addCard(index: i)
         }
+        delegate?.cardsViewController(self, didShowCardAt: 0)
     }
     
-    /// Programatically run an animation for the topmost card.
+    /// Programmatically run an animation for the topmost card.
     public func performCardSwipeAnimation(_ animation: SwipeAnimation, direction: SwipeDirection) {
         guard let card = cards.first else { return }
         switch animation {
         case .throwOut:
             throwOutAnimation(
                 card: card,
-                velocity: AnimationHelpers.velosity(for: direction),
+                velocity: AnimationHelpers.velocity(for: direction),
                 direction: direction,
                 fromSwipe: false
             )
         case .putAtTheEnd:
             putAtTheEndAnimation(
                 card: card,
-                velocity: AnimationHelpers.velosity(for: direction),
+                velocity: AnimationHelpers.velocity(for: direction),
                 direction: direction
             )
         case .none:
@@ -183,6 +184,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             tapAnimation(at: card.absoluteIndex) == .flip
         else { return }
         
+        card.viewController.willFlipCard()
         let prevView = card.isFlipped ? backView : card.viewController.frontView
         let nextView = card.isFlipped ? card.viewController.frontView : backView
         view.isUserInteractionEnabled = false
@@ -197,6 +199,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
                 card.isFlipped.toggle()
             }, completion: { _ in
                 self.view.isUserInteractionEnabled = true
+                card.viewController.didFlipCard()
             })
     }
     
@@ -258,7 +261,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         card.animator?.stopAnimation(true)
         
         // First animation - throw out the card
-        card.state = .removingAnimtion
+        card.state = .removingAnimation
         let firstAnimator = ThrowOutAnimation(
             initialVelocity: velocity,
             containerFrame: self.view.frame,
@@ -280,16 +283,20 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         // Second animation - add new card at the back
         let newCard = addNextCard()
         newCard?.containerView.alpha = 0.0
-        let restCards = cards.filter { $0.state != .removingAnimtion }
+        let restCards = cards.filter { $0.state != .removingAnimation }
         for i in 0..<restCards.count {
             let card = restCards[i]
             card.visibleIndex = i
             card.state = .transformAnimation
             let animator = transformAnimator(for: card)
             card.animator = animator
-            animator.addCompletion { _ in
+            animator.addCompletion { [weak self] _ in
+                guard let self = self else { return }
                 card.state = .inStack
                 card.animator = nil
+                if i == 0 {
+                    self.delegate?.cardsViewController(self, didShowCardAt: card.absoluteIndex)
+                }
             }
             animator.startAnimation()
         }
@@ -307,7 +314,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         let view = card.containerView
         
         // First animation - throw out the card
-        card.state = .removingAnimtion
+        card.state = .removingAnimation
         let firstAnimator = ThrowOutAnimation(
             initialVelocity: velocity,
             containerFrame: view.frame,
@@ -340,13 +347,13 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         
         let normalCards = cards
             .filter {
-                $0.state != .removingAnimtion && $0.absoluteIndex != deletedCard.absoluteIndex
+                $0.state != .removingAnimation && $0.absoluteIndex != deletedCard.absoluteIndex
             }
             .sorted { $0.absoluteIndex < $1.absoluteIndex }
         
         let deletedCards = cards
             .filter {
-                $0.state == .removingAnimtion || $0.absoluteIndex == deletedCard.absoluteIndex
+                $0.state == .removingAnimation || $0.absoluteIndex == deletedCard.absoluteIndex
             }
             .sorted { $0.absoluteIndex < $1.absoluteIndex }
         
@@ -357,7 +364,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             let card = cards[i]
             card.visibleIndex = i
             
-            if card.state == .removingAnimtion { continue }
+            if card.state == .removingAnimation { continue }
             
             if card.absoluteIndex != deletedCard.absoluteIndex {
                 let animator = transformAnimator(for: card)
@@ -371,7 +378,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             } else {
                 let animator = transformAnimator(for: card)
                 card.animator = animator
-                card.state = .removingAnimtion
+                card.state = .removingAnimation
                 animator.addAnimations {
                     card.containerView.alpha = 0.2
                 }
@@ -394,7 +401,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         animator.addCompletion { _ in
             card.state = .inStack
         }
-        delegate?.cardsViewController(self, cancelMoveCardAt: view.tag)
+        delegate?.cardsViewController(self, cancelMoveCardAt: card.absoluteIndex)
     }
 
     private func canFinishSwipe(cardIndex: Int, translation: CGPoint, velocity: CGPoint) -> Bool {

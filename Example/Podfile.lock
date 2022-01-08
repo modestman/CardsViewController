@@ -1,5 +1,5 @@
 PODS:
-  - CardsViewController (1.0.0)
+  - CardsViewController (1.1.2)
 
 DEPENDENCIES:
   - CardsViewController (from `../`)
@@ -9,8 +9,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CardsViewController: 7fb3db33c1f8320e00ed7b25ab11baedfbc3d80a
+  CardsViewController: bd281bab5b4812cd6762637d5abecdbcfd9e31e0
 
 PODFILE CHECKSUM: 39dc2c209cfb52439899e593f3dc1123e6de9e83
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.11.2

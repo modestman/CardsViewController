@@ -57,4 +57,14 @@ public extension CardsViewControllerDelegate {
     func cardsViewController(
         _ cardsViewController: CardsViewController,
         cancelMoveCardAt index: Int) {}
+    
+    func cardsViewController(
+        _ cardsViewController: CardsViewController,
+        didShowCardAt index: Int) {}
+}
+
+/// Default implementation
+public extension CardViewController {
+    func willFlipCard() {}
+    func didFlipCard() {}
 }
