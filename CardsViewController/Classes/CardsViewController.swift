@@ -100,6 +100,10 @@ public final class CardsViewController: UIViewController {
         shake.animator.startAnimation()
     }
     
+    public func cardViewController(at index: Int) -> CardViewController? {
+        cards.first { $0.absoluteIndex == index }?.viewController
+    }
+    
     // MARK: - Private methods
     
     @discardableResult
@@ -124,6 +128,7 @@ public final class CardsViewController: UIViewController {
             childView.leftAnchor.constraint(equalTo: safeArea.leftAnchor, constant: cardEdgeInsets.left),
             childView.rightAnchor.constraint(equalTo: safeArea.rightAnchor, constant: -cardEdgeInsets.right)
         ])
+        childVC.didMove(toParent: self)
         view.sendSubviewToBack(childView)
         cardTransform(childView, card.visibleIndex)
         
