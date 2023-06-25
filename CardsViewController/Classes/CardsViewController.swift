@@ -147,12 +147,27 @@ public final class CardsViewController: UIViewController {
     private func addNextCard() -> Card? {
         guard
             let dataSource = dataSource,
-            let lastCard = cards.max(by: { $0.absoluteIndex < $1.absoluteIndex })
+            let lastCard = cards
+                .filter({ !$0.willBeDeleted })
+                .max(by: { $0.absoluteIndex < $1.absoluteIndex })
         else { return nil }
         if lastCard.absoluteIndex < dataSource.numberOfItemsInCardsViewController(self) - 1 {
             return addCard(index: lastCard.absoluteIndex + 1)
         }
         return nil
+    }
+    
+    /// Should we delete this card from view hierarchy
+    /// `true` - if datasource can add next card
+    /// `false` - if there are fewer cards left than visibleCardsCount
+    private func isCardOutOfStack(_ card: Card) -> Bool {
+        guard
+            let dataSource = dataSource,
+            let lastCard = cards
+                .filter({ $0.absoluteIndex != card.absoluteIndex })
+                .max(by: { $0.absoluteIndex < $1.absoluteIndex })
+        else { return false }
+        return lastCard.absoluteIndex < dataSource.numberOfItemsInCardsViewController(self) - 1
     }
     
     private func deleteCard(index: Int) {
@@ -332,8 +347,12 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             card.animator = nil
             card.state = .inStack
             
+            let shouldRemoveCurrentCard = isCardOutOfStack(card)
+            let newIndex = self.delegate?.cardsViewController(self, moveToTheEndCardAt: card.absoluteIndex) ?? Int.max
+            self.reorderCards(card, newIndex: newIndex)
+            
             // Second animation - put the card at the end of stack and add a new card at the back
-            self.finishPutAtTheEndAnimation(deletedCard: card) {
+            self.finishPutAtTheEndAnimation(currentCard: card, shouldBeRemoved: shouldRemoveCurrentCard) {
                 self.delegate?.cardsViewController(
                     self,
                     finishMoveCardAt: card.absoluteIndex,
@@ -345,25 +364,39 @@ extension CardsViewController: UIGestureRecognizerDelegate {
         firstAnimator.startAnimation()
     }
     
-    private func finishPutAtTheEndAnimation(deletedCard: Card, completion: @escaping () -> Void) {
-        
+    private func reorderCards(_ card: Card, newIndex: Int) {
+        card.absoluteIndex = newIndex
+        card.containerView.tag = newIndex
+        cards.forEach {
+            if $0.visibleIndex != card.visibleIndex {
+                $0.absoluteIndex -= 1
+                $0.containerView.tag = $0.absoluteIndex
+            }
+        }
+    }
+    
+    private func finishPutAtTheEndAnimation(currentCard: Card, shouldBeRemoved: Bool, completion: @escaping () -> Void) {
+        currentCard.willBeDeleted = shouldBeRemoved
         let newCard = addNextCard()
         newCard?.containerView.alpha = 0.0
         
         let normalCards = cards
             .filter {
-                $0.state != .removingAnimation && $0.absoluteIndex != deletedCard.absoluteIndex
+                $0.state != .removingAnimation && !$0.willBeDeleted
             }
             .sorted { $0.absoluteIndex < $1.absoluteIndex }
         
         let deletedCards = cards
             .filter {
-                $0.state == .removingAnimation || $0.absoluteIndex == deletedCard.absoluteIndex
+                $0.state == .removingAnimation || $0.willBeDeleted
             }
             .sorted { $0.absoluteIndex < $1.absoluteIndex }
         
         cards = normalCards + deletedCards
         deletedCards.forEach { view.sendSubviewToBack($0.containerView) }
+        if !shouldBeRemoved {
+            view.sendSubviewToBack(currentCard.containerView)
+        }
         
         for i in 0..<cards.count {
             let card = cards[i]
@@ -371,16 +404,7 @@ extension CardsViewController: UIGestureRecognizerDelegate {
             
             if card.state == .removingAnimation { continue }
             
-            if card.absoluteIndex != deletedCard.absoluteIndex {
-                let animator = transformAnimator(for: card)
-                card.state = .transformAnimation
-                card.animator = animator
-                animator.addCompletion { _ in
-                    card.state = .inStack
-                    card.animator = nil
-                }
-                animator.startAnimation()
-            } else {
+            if shouldBeRemoved && card.absoluteIndex == currentCard.absoluteIndex {
                 let animator = transformAnimator(for: card)
                 card.animator = animator
                 card.state = .removingAnimation
@@ -391,8 +415,17 @@ extension CardsViewController: UIGestureRecognizerDelegate {
                     guard let self = self else { return }
                     card.animator = nil
                     card.state = .inStack
-                    self.deleteCard(index: deletedCard.absoluteIndex)
+                    self.deleteCard(index: currentCard.absoluteIndex)
                     completion()
+                }
+                animator.startAnimation()
+            } else {
+                let animator = transformAnimator(for: card)
+                card.state = .transformAnimation
+                card.animator = animator
+                animator.addCompletion { _ in
+                    card.state = .inStack
+                    card.animator = nil
                 }
                 animator.startAnimation()
             }

@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet private weak var stackView: UIStackView!
     let cardsController = CardsViewController()
     
-    let colors: [UIColor] = [
+    static let originalColors: [UIColor] = [
         .systemPink,
         .systemTeal,
         .systemGreen,
@@ -25,6 +25,8 @@ class ViewController: UIViewController {
         .systemRed,
         .systemOrange
     ]
+    
+    var colors: [UIColor] = ViewController.originalColors
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,7 +75,10 @@ extension ViewController: CardsViewControllerDatasource {
             vc.view.backgroundColor = colors[index]
         } else {
             let reloadVC = ReloadViewController()
-            reloadVC.action = { self.cardsController.reloadCards() }
+            reloadVC.action = {
+                self.colors = ViewController.originalColors
+                self.cardsController.reloadCards()
+            }
             vc = reloadVC
         }
         return vc
@@ -129,9 +134,24 @@ extension ViewController: CardsViewControllerDelegate {
             return .throwOut
         case .left:
             return .putAtTheEnd
-        case .up, .down:
+        case .up:
+            if index < colors.count - 1 {
+                return .putAtTheEnd
+            } else {
+                return .none
+            }
+        case .down:
             return .none
         }
+    }
+    
+    func cardsViewController(
+        _ cardsViewController: CardsViewController,
+        moveToTheEndCardAt index: Int
+    ) -> Int {
+        let card = colors.remove(at: index)
+        colors.append(card)
+        return colors.index(before: colors.endIndex)
     }
     
     func cardsViewController(

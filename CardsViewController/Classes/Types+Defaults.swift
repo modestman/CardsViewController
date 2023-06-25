@@ -30,16 +30,23 @@ public extension CardsViewControllerDelegate {
     func cardsViewController(
         _ cardsViewController: CardsViewController,
         swipeAnimationAt index: Int,
-        direction: SwipeDirection) -> SwipeAnimation {
-        
+        direction: SwipeDirection
+    ) -> SwipeAnimation {
         return .throwOut
     }
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
-        tapAnimationAtIndex index: Int) -> TapAnimation {
-        
+        tapAnimationAtIndex index: Int
+    ) -> TapAnimation {
         return .none
+    }
+    
+    func cardsViewController(
+        _ cardsViewController: CardsViewController,
+        moveToTheEndCardAt index: Int
+    ) -> Int {
+        return index
     }
     
     func cardsViewController(

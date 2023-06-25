@@ -83,7 +83,7 @@ public protocol CardsViewControllerDatasource: AnyObject {
     /// Optional method. By default used `.identity` as a transform.
     ///
     /// - Parameters:
-    ///   - card: The view 
+    ///   - card: The view
     ///   - position: Position is a z-order of card on screen. Topmost card has position = 0.
     func cardsViewController(
         _ cardsViewController: CardsViewController,
@@ -103,6 +103,10 @@ public protocol CardsViewControllerDelegate: AnyObject {
     func cardsViewController(
         _ cardsViewController: CardsViewController,
         tapAnimationAt index: Int) -> TapAnimation
+    
+    func cardsViewController(
+        _ cardsViewController: CardsViewController,
+        moveToTheEndCardAt index: Int) -> Int
     
     func cardsViewController(
         _ cardsViewController: CardsViewController,
@@ -137,13 +141,14 @@ internal enum CardSate {
 }
 
 internal class Card {
-    let absoluteIndex: Int
+    var absoluteIndex: Int
     var visibleIndex: Int
     let containerView: UIView
     let viewController: CardViewController
     var state: CardSate
     var isFlipped: Bool
     var animator: UIViewPropertyAnimator?
+    var willBeDeleted: Bool = false
     
     init(
         absoluteIndex: Int,
