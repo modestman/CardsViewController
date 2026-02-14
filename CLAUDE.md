@@ -12,17 +12,26 @@ CardsViewController is an iOS Swift library providing a swipeable card stack UI 
 
 ## Build & Development
 
-The project supports both CocoaPods and Swift Package Manager. The Xcode workspace for the Example app is in the `Example/` directory.
+The library is distributed via Swift Package Manager. The Example app is in `Example/`.
 
 ```bash
-# CocoaPods (run from Example/)
-cd Example && pod install
-open Example/CardsViewController.xcworkspace
-
-# SPM: add via Xcode (File > Add Package Dependencies) or Package.swift
+# Open the Example project (no pod install needed — uses local SPM package)
+open Example/CardsViewController.xcodeproj
 ```
 
-Tests are in `Example/Tests/Tests.swift` — run via Xcode (Cmd+U) on the `CardsViewController_Tests` target. Test scaffolding is minimal.
+The Example project references the library as a local SPM package (`XCLocalSwiftPackageReference ".."`), so changes to `Sources/` are picked up automatically.
+
+**Build:** select the `CardsViewController_Example` scheme in Xcode, then Build (Cmd+B).
+
+**Tests:** `Example/Tests/Tests.swift` — run via Xcode (Cmd+U) on the `CardsViewController_Tests` target. Test scaffolding is minimal.
+
+**CLI build (if needed):**
+```bash
+xcodebuild -project Example/CardsViewController.xcodeproj \
+  -scheme CardsViewController_Example \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  build
+```
 
 ## Architecture
 
