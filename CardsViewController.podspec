@@ -11,6 +11,6 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/modestman/CardsViewController.git', :tag => s.version.to_s }
   s.swift_version    = '5.0'
   s.ios.deployment_target = '11.0'
-  s.source_files = 'CardsViewController/Classes/**/*'
+  s.source_files = 'Sources/CardsViewController/**/*'
   s.frameworks = 'UIKit'
 end
